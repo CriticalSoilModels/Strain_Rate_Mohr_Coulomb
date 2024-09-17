@@ -758,10 +758,12 @@ contains
 
       ! Calc the stress predictor
       call MatVec(DE, 6, dEpsE, 6, dSig)
-
+      print *, "Strain increment:", dEpsE
+      print *, "Stress increment:", dSig
+      print *, "Originial Stress:", Sigu
       !Update the stresses
       Sigu = Sigu + dSig
-
+      print *, "Updated Stress:", Sigu
       !-----------------End Compute elastic predictor------------------------!
       ! Since all strain is assumed to be elastic no plastic strain increment
 
@@ -778,7 +780,7 @@ contains
       ! Compute the value of the yield Function
       call YieldFunction(q, p, eta_yu, F)
 
-      if (abs(F) < FTOL) then
+      if (F < FTOL) then
          ! Prediction is correct, stress and strain values can be updated and returned
 
          ! Update Sig, EpsP, dEpsP, eta_y, Dp
@@ -787,7 +789,7 @@ contains
          ! dEpsP = dEpsPu
          eta_y = eta_yu
          Dp = Du
-
+         print *, "Updated elasti c stress", Sig
          ! Exit out of the Subroutine and return values
          return
       endif
@@ -807,7 +809,7 @@ contains
       ! Compute stress invariants
       call Get_invariants(Sigu, p, q, dummyVal)
 
-      do while (F>= - FTOL .and. counter <= max_stress_iters)
+      do while (abs(F)>= FTOL .and. counter <= max_stress_iters)
          !---------------------Begin Compute derivatives--------------------------!
          call Get_dF_to_dSigma(Mu, eta_yu, Sigu, n_vec) !n=dF/dSig
          call Get_dP_to_dSigma(Du, Sigu, m_vec) !m=dP/dSig
@@ -886,7 +888,8 @@ contains
       dD = Du -Dp
       Dp = Du
       M = Mu
-
+      
+      print *, "Updated plastic stress", Sig
    end subroutine Ortiz_Simo_Integration
 !______________________________________________________________________________________
 !######## ##     ## ##       ######## ########      ######
@@ -1735,9 +1738,16 @@ contains
       ! O   VecR  : Resulting vector
       !
       !***********************************************************************
-      Implicit Double Precision (A-H,O-Z)
-      Dimension xMat(IM,*),Vec(*),VecR(*)
+      implicit none
+      real(real_type), intent(in)  :: xMat(N, N), Vec(N)
+      integer, intent(in)          :: IM, N
+      real(real_type), intent(out) :: VecR(N)
+
       !***********************************************************************
+      ! Local variables
+      integer :: I, J
+      real(real_type) :: X
+
       Do I=1,N
          X=0
          Do J=1,N
@@ -1758,9 +1768,14 @@ contains
       ! O   Dp : Dot product
       !
       !***********************************************************************
-      Implicit Double Precision (A-H,O-Z)
-      Dimension VecA(N), VecB(N)
+      implicit none
+      real(real_type), intent(in)  :: VecA(N), VecB(N)
+      integer, intent(in)          :: N
+      real(real_type), intent(out) :: Dp
+
       !***********************************************************************
+      ! Local variables
+      integer :: I
       Dp=0.0d0
       Do I=1,N
          Dp=Dp+VecA(I)*VecB(I)
@@ -1783,7 +1798,7 @@ contains
       endif
    end subroutine dbltobool
 
-   function logic2dbl(a)
+   real(real_type) function logic2dbl(a)
       logical, intent(in) :: a
 
       if (a) then
