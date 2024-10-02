@@ -1,8 +1,10 @@
 module mod_SRMC_Ortiz_Simo
 
-    use mod_SRMC_funcs, only: check4crossing, Get_strain_invariants, Update_GK, Get_Dp, MatVec, Get_invariants, Get_M, YieldFunction, Get_dD_to_dEpsP, &
-                              Get_invariants, Get_dF_to_dSigma, Get_dP_to_dSigma, DotProduct_2 ! Subroutines that are required for calculations
-
+    use mod_SRMC_funcs, only: check4crossing, Get_strain_invariants, Update_GK, Get_Dp, MatVec, Get_invariants, &
+                              Get_M, YieldFunction, Get_dD_to_dEpsP, Get_dF_to_dSigma, Get_dP_to_dSigma, &
+                              DotProduct_2 ! Subroutines that are required for calculations
+    use mod_stress_invariants, only : Get_invariants
+    
     implicit none
 
     contains
@@ -130,12 +132,9 @@ subroutine Ortiz_Simo_Integration(G_0, nu, M_tc, M, No, D_min, h, G, K, eta_y, D
 
     ! Calc the stress predictor
     call MatVec(DE, 6, dEpsE, 6, dSig)
-    print *, "Strain increment:", dEpsE
-    print *, "Stress increment:", dSig
-    print *, "Originial Stress:", Sigu
+    
     !Update the stresses
     Sigu = Sigu + dSig
-    print *, "Updated Stress:", Sigu
     !-----------------End Compute elastic predictor------------------------!
     ! Since all strain is assumed to be elastic no plastic strain increment
 
@@ -161,7 +160,6 @@ subroutine Ortiz_Simo_Integration(G_0, nu, M_tc, M, No, D_min, h, G, K, eta_y, D
        ! dEpsP = dEpsPu
        eta_y = eta_yu
        Dp = Du
-       print *, "Updated elasti c stress", Sig
        ! Exit out of the Subroutine and return values
        return
     endif
@@ -233,7 +231,11 @@ subroutine Ortiz_Simo_Integration(G_0, nu, M_tc, M, No, D_min, h, G, K, eta_y, D
        dD = 0.0
        ! This line gives difficulties sometimes
        call DotProduct_2(a, dEpsPu, 6, dD) !plastic hard/softening
-       Du = Du + dD
+       
+       ! Calc the new dilatancy 
+       call Get_Dp(h, D_min, I_f, I_0, epsq_p, k_D, ApplyStrainRateUpdate, Du)
+
+      !  Du = Du + dD
 
        ! Update eta_y
        eta_yu = Mu - Du * (1.0 -No)
@@ -262,7 +264,6 @@ subroutine Ortiz_Simo_Integration(G_0, nu, M_tc, M, No, D_min, h, G, K, eta_y, D
     Dp = Du
     M = Mu
     
-    print *, "Updated plastic stress", Sig
  end subroutine Ortiz_Simo_Integration
 
 end module mod_SRMC_Ortiz_Simo
