@@ -4,9 +4,10 @@ program tester
     use testdrive, only : run_testsuite, new_testsuite, testsuite_type, &
       & select_suite, run_selected, get_argument, test_failed, init_color_output
   
-    use test_invariants_suite, only : collect_invariants_suite
-    use mod_test_J3_invariant, only : collect_J3_invariant
     use mod_test_yield_function, only : collect_yield_function_deriv
+    use mod_test_stress_invariants_suite, only : collect_stress_invariants_suite
+    use mod_test_strain_invariants_suite, only: collect_strain_invariants_suite
+    use mod_test_stress_invar_deriv_suite, only: collect_stress_invar_deriv_suite
 
     implicit none
     integer :: stat, is
@@ -21,9 +22,9 @@ program tester
   
     ! Make a list of the test suites from the differnt modules
     testsuites = [ &
-      new_testsuite("test_invariants_suite", collect_invariants_suite), &
-      new_testsuite("test_J3_suite",         collect_J3_invariant)    , &
-      new_testsuite("test_yield_func_deriv", collect_yield_function_deriv) &
+      new_testsuite("test_strain_invar_suite", collect_strain_invariants_suite), &
+      new_testsuite("test_invariants_suite", collect_stress_invariants_suite)  , &
+      new_testsuite("test_strain_invar_deriv_suite", collect_stress_invar_deriv_suite) &
       ]
     ! Make the output colorful
     call init_color_output(.True.)

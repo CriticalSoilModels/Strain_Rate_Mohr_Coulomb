@@ -123,19 +123,13 @@ contains
       J2 = 0.5_dp * J2**2
    end function calc_J2_invariant
 
-   pure function calc_eig_J3(dev_eig_vals) result (det_s)
-      real(kind = dp), intent(in) :: dev_eig_vals(3)
-      real(kind = dp) :: det_s
-      ! J3 = det(s) = 1/3 ( s_{1}^{3} + s_{2}^{3} + s_{3}^{3} )
+   pure function calc_q_invariant(J2) result(q)
+      real(kind = dp), intent(in) :: J2
+      real(kind = dp) :: q
 
-      ! Local varaibles
-      real(kind = dp) :: inside
+      q = sqrt(3.0_dp * J2)
 
-      ! Cube each eigen value than sum them up
-      inside = sum( dev_eig_vals**3 )
-
-      det_s = inside / 3.0
-   end function calc_eig_J3
+   end function calc_q_invariant
 
    pure function calc_Zam_J3_invariant(stress) result(J3)
       real(kind = dp), intent(in) :: stress(6)
@@ -174,7 +168,7 @@ contains
 
       J2 = calc_J2_invariant(dev)
 
-      q=sqrt(3*J2) ! deviatoric stress
+      q = calc_q_invariant(J2) ! deviatoric stress
 
       !J3 stress invariant
       J3 = calc_inc_driver_J3_invariant(dev)
