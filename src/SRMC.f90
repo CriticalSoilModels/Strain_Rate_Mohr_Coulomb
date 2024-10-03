@@ -1,7 +1,9 @@
 module mod_SRMC
-   use mod_SRMC_funcs, only: Get_strain_invariants, Get_I_coeff, Get_M, Get_Dp, YieldFunction, &
-                             check4crossing, Update_GK, MatVec, Check_Unloading
+   use mod_SRMC_funcs, only: MatVec
+   use mod_strain_invariants, only: Get_strain_invariants
    use mod_stress_invariants, only : Get_invariants                             
+   use mod_state_params     , only: Get_I_coeff, Get_M, Get_Dp, check4crossing, Update_GK, Check_Unloading
+   use mod_yield_function   , only: YieldFunction
    use mod_voigt_functions, only: TwoNormTensor, TwoNormTensor_strain
    use mod_SRMC_Substepping, only: Euler_Algorithm, Newton_Raphson, Stress_Drift_Correction
 

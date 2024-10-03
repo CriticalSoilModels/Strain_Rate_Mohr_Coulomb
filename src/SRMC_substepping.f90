@@ -1,8 +1,13 @@
 module mod_SRMC_Substepping
-    use mod_SRMC_funcs, only: check4crossing, Update_GK, Get_Dp, MatVec, Get_invariants, Get_strain_invariants, Get_dF_to_dSigma, &
-                              Get_dP_to_dSigma, Get_dD_to_dEpsP, Get_dD_to_dI, DotProduct_2, Get_dEpsq_to_dEps, Check_Unloading, &
-                              YieldFunction
+    use mod_SRMC_funcs, only:  MatVec,  DotProduct_2
+    use mod_state_params, only: check4crossing, Update_GK, Get_dp, Check_Unloading
+    use mod_strain_invariants, only: Get_strain_invariants
+    use mod_strain_invar_deriv, only: Get_dEpsq_to_dEps
     use mod_stress_invariants, only : Get_invariants                           
+    use mod_yield_function, only: Get_dF_to_dSigma, YieldFunction
+    use mod_plastic_potential, only: Get_dP_to_dSigma
+    use mod_state_params_deriv, only: Get_dD_to_dEpsP, Get_dD_to_dI
+
     implicit none
     
 contains

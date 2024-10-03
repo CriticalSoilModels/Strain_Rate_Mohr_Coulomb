@@ -118,23 +118,9 @@ contains
 
    end function calc_inc_driver_dJ3_to_dSigma
 
-   function calc_Zam_dtheta_to_dSigma(dJ3dsig, dev, J3, J2, theta) result(dthetadSig)
-      ! Function to calcute dtheta / dSigma following the formula Zambrano originally had
-      ! This formula is differnt than what Pott's has
-      real(kind = real_type) :: dJ3dSig(6), dev(6), J3, J2, theta
-      real(kind = real_type) :: dthetadSig(6)
-
-      ! Local variables
-      real(kind = real_type) :: COS_3THETA
-
-      dthetadSig = dJ3dsig - ( 1.5*J3 / J2 ) * dev
-      COS_3THETA = cos( 3.0*theta )
-      dthetadSig = ( sqrt(3.0) / ( 2.0*COS_3THETA*J2**1.5 ) ) * dthetadSig
-   end function calc_Zam_dtheta_to_dSigma
-
-   function calc_dtheta_to_dSigma(dJ3_dSigma, dev, J3, J2, theta) result(dtheta_dSigma)
-      real(kind = real_type) :: dJ3_dSigma(6), dev(6)
-      real(kind = real_type) :: J3, J2, theta
+   pure function calc_dtheta_to_dSigma(dJ3_dSigma, dev, J3, J2, theta) result(dtheta_dSigma)
+      real(kind = real_type), intent(in) :: dJ3_dSigma(6), dev(6)
+      real(kind = real_type), intent(in) :: J3, J2, theta
       real(kind = real_type) :: dtheta_dSigma(6)
 
       ! Local variables

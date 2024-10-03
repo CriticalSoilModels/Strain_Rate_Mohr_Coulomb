@@ -1,8 +1,25 @@
 module mod_voigt_functions
-   use kind_precision_module, only: dp
+   use kind_precision_module, only: dp, i32
    implicit none
 
 contains
+
+   pure function calc_dev_stess(stress, mean_stress) result(dev_stress)
+      real(kind = dp), intent(in) :: stress(6), mean_stress
+      real(kind = dp) :: dev_stress(6)
+
+      ! Local variables
+      integer(i32) :: i
+
+      ! Initialize the deviatoric stress to the input stress
+      dev_stress = stress
+
+      ! Subtract mean stress from normal components
+      do i = 1, 3
+         dev_stress(i) = dev_stress(i) - mean_stress
+      end do
+
+   end function calc_dev_stess
 
    pure Subroutine TwoNormTensor(Tensor, N, TwoNorm)
       !***********************************************************************
@@ -123,7 +140,7 @@ contains
       ! Assumes incremental driver ordering for the voigt vector
       real(kind = dp), intent(in) :: voigt(6)
       real(kind = dp) :: voigt2(6)
-      
+
       voigt2(1)=voigt(1)**2 + voigt(4)**2 + voigt(5)**2
       voigt2(2)=voigt(2)**2 + voigt(4)**2 + voigt(6)**2
       voigt2(3)=voigt(3)**2 + voigt(5)**2 + voigt(6)**2
@@ -131,5 +148,35 @@ contains
       voigt2(5)=voigt(5) * ( voigt(1) + voigt(3) ) + voigt(4)*voigt(6)
       voigt2(6)=voigt(6) * ( voigt(2) + voigt(3) ) + voigt(4)*voigt(5)
    end function square_inc_driver_voigt_vector
+
+   pure Subroutine TensorInnerProduct(TensorA, TensorB, N, Re)
+      !***********************************************************************
+      !
+      !     Calculate 2NormTensor = sqrt(A:A)
+      !
+      ! I   Tensor  : (Square or vector of dimension N)
+      ! I   N     :   Number of elements
+      ! O   2Norm : Resulting norm
+      !
+      !***********************************************************************
+      implicit none
+
+      real(kind = dp),intent(in) :: TensorA(N), TensorB(N)
+      real(kind = dp),intent(out) :: Re
+      integer, intent(in) :: N
+      !***********************************************************************
+
+      ! Local variables
+      integer :: X, I
+
+      X=N/2
+      Re=0.0d0
+      Do I=1,X
+         Re=Re+TensorA(I)*TensorB(I)
+      end Do
+      Do I=X+1,N
+         Re=Re+2*(TensorA(I)*TensorB(I))
+      end do
+   end subroutine TensorInnerProduct
 
 end module mod_voigt_functions

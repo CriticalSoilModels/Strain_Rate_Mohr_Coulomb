@@ -1,7 +1,7 @@
 module mod_stress_invariants
    use kind_precision_module, only : dp, i32
 
-   use mod_voigt_functions, only : TwoNormTensor, TwoNormTensor_strain
+   use mod_voigt_functions, only : TwoNormTensor, TwoNormTensor_strain, calc_dev_stess
 
    implicit none
 
@@ -23,23 +23,6 @@ contains
 
       mean_stress = mean_stress / 3.0_dp
    end function calc_mean_stress
-
-   pure function calc_dev_stess(stress, mean_stress) result(dev_stress)
-      real(kind = dp), intent(in) :: stress(6), mean_stress
-      real(kind = dp) :: dev_stress(6)
-
-      ! Local variables
-      integer(i32) :: i
-
-      ! Initialize the deviatoric stress to the input stress
-      dev_stress = stress
-
-      ! Subtract mean stress from normal components
-      do i = 1, 3
-         dev_stress(i) = dev_stress(i) - mean_stress
-      end do
-
-   end function calc_dev_stess
 
    pure function calc_theta_s(J2, J3) result(lode_angle)
       real(kind=dp), intent(in) :: J2, J3
@@ -149,7 +132,7 @@ contains
 
    end function calc_Zam_J3_invariant
 
-   subroutine Get_invariants(Sig, p, q, theta)
+   pure subroutine Get_invariants(Sig, p, q, theta)
       !*********************************************************************
       ! Takes the stress tensor Sig and return invariants p, q, and theta  *
       !																	 *
@@ -177,25 +160,4 @@ contains
 
    end subroutine Get_invariants
    
-   function calc_dJ3_dSigma_full(s_matrix) result(dJ3_dSigma)
-      ! Function to calculate dJ3/dSigma using the full matrix
-      real(kind = dp) :: s_matrix(3,3)
-      real(kind = dp) :: dJ3_dSigma(3,3)
-      
-      ! Local varaibles
-      real(kind=  dp) :: s2(3,3)
-      real(kind = dp) :: mean_stress
-      integer(kind = i32):: i
-
-      s2 = matmul(s_matrix, s_matrix)
-      
-      mean_stress = 0.0_dp
-
-      do i = 1, 3
-         mean_stress = mean_stress + s2(i, i)
-      end do
-
-      dJ3_dSigma = s2 - mean_stress
-
-   end function calc_dJ3_dSigma_full
 end module mod_stress_invariants

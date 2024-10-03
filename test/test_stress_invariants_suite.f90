@@ -3,9 +3,9 @@ module mod_test_stress_invariants_suite
    use kind_precision_module, only : dp, i32
    use mod_SRMC_funcs       , only : Get_strain_invariants
    use mod_stress_invariants, only : Get_invariants, calc_theta_s, calc_J2_invariant, &
-                                     calc_inc_driver_J3_invariant, calc_dev_stess, calc_mean_stress
+                                     calc_inc_driver_J3_invariant, calc_mean_stress
    use stdlib_linalg        , only : det
-   use mod_voigt_functions  , only : inc_driver_voigt_2_matrix
+   use mod_voigt_functions  , only : inc_driver_voigt_2_matrix, calc_dev_stess
 
    ! Testdrive imports
    use testdrive, only : new_unittest, unittest_type, error_type, check

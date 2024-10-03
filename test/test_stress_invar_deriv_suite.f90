@@ -1,11 +1,11 @@
 module mod_test_stress_invar_deriv_suite
     ! Imports
     use kind_precision_module, only: dp, i32
-    use mod_stress_invariants, only: calc_dev_stess, calc_mean_stress, calc_q_invariant, calc_J2_invariant, &
+    use mod_stress_invariants, only: calc_mean_stress, calc_q_invariant, calc_J2_invariant, &
                                      calc_inc_driver_J3_invariant, calc_theta_s
     use mod_stress_invar_deriv, only: calc_dp_to_dSigma, calc_dq_to_dSigma, calc_dJ2_to_dSigma, calc_dJ3_to_dSigma, &
                                       calc_inc_driver_dJ3_to_dSigma, calc_dtheta_to_dSigma, calc_dtheta_to_dSigma_2
-
+    use mod_voigt_functions   , only: calc_dev_stess
     use mod_tensor_value_checker, only: check_tensor_values
 
     ! Testdrive imports

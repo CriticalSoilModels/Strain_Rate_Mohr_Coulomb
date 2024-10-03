@@ -1,7 +1,9 @@
+! Module holds the yield function equation and the derivatives of the yield function
 module mod_yield_function
    use kind_precision_module, only: real_type => dp
-   use mod_stress_invariants, only : calc_inc_driver_J3_invariant, Get_invariants, calc_dev_stess, calc_J2_invariant
-   use mod_stress_invar_deriv, only: calc_dp_to_dSigma, calc_dq_to_dSigma, calc_dJ3_to_dSigma, calc_Zam_dtheta_to_dSigma
+   use mod_stress_invariants, only : calc_inc_driver_J3_invariant, Get_invariants, calc_J2_invariant
+   use mod_stress_invar_deriv, only: calc_dp_to_dSigma, calc_dq_to_dSigma, calc_dJ3_to_dSigma, calc_dtheta_to_dSigma
+   use mod_voigt_functions   , only: calc_dev_stess
    implicit none
 
 contains
@@ -18,7 +20,7 @@ contains
 
    end function calc_dF_to_dtheta
 
-   subroutine Get_dF_to_dSigma_2(M_tc, eta_y, Sig, n_vec)
+   pure subroutine Get_dF_to_dSigma(M_tc, eta_y, Sig, n_vec)
       !************************************************************************
       ! Returns the derivative of the yield function with respect to the		*
       ! stress tensor 														*
@@ -27,13 +29,12 @@ contains
       !************************************************************************
       implicit none
       !input
-      double precision, intent(in):: M_tc, eta_y, Sig(6)
-      !output
-      double precision, dimension(6):: n_vec
-      !local variables
-      double precision:: p, q, theta, &
-         J2, J3, dJ3dsig(6), dfdtheta, &
-         dpdsig(6), dqdsig(6), dev(6), dthetadSig(6)
+      real(kind = real_type), intent(in)  :: M_tc, eta_y, Sig(6)
+      real(kind = real_type), intent(out) :: n_vec(6)
+
+      ! Local variables
+      real(kind = real_type):: p, q, theta, J2, J3, dJ3dsig(6), dfdtheta, &
+                               dpdsig(6), dqdsig(6), dev(6), dthetadSig(6)
 
       !Get the invariants
       call Get_invariants(Sig, p, q, theta)
@@ -59,22 +60,22 @@ contains
       dJ3dsig = calc_dJ3_to_dSigma(dev)
 
       !Compute dtheta/dsig
-      dthetadSig = calc_Zam_dtheta_to_dSigma(dJ3dsig, dev, J3, J2, theta)
+      dthetadSig = calc_dtheta_to_dSigma(dJ3dsig, dev, J3, J2, theta)
 
-      ! TODO: Remove this
-      ! print *, "------ Lode angle derivative test -------"
-      ! print *, "Lode angle: ", theta
-      ! print *, "J2 invariant", J2
-      ! print *, "det (s)    :", J3
-      ! print *, "dJ / dsigma check: ", 1.0_real_type / (2.0_real_type * sqrt(J2)) * calc_dJ2_to_dSigma(dev)
-      ! print *, "dJ3 / dsigma: ", dJ3dsig
-      ! print *, "My dtheta / dsigma", calc_dtheta_to_dSigma(dJ3dsig, dev, j3, j2, theta)
-      ! print *, "dtheta / dsigma", dthetadSig
-
-      ! print *, "------ End Lode angle Derivative test ---"
-      !__________________________________________________________________
-      !Get n_vec=dF/dSig
+      !Get n_vec=dF/dSig 
       n_vec = ( eta_y * dpdsig ) + dqdSig + ( dfdtheta * dthetadSig) !n_vec=dF/dSig
-   end subroutine Get_dF_to_dSigma_2
+   end subroutine Get_dF_to_dSigma
+
+   pure subroutine YieldFunction(q, p, eta_y, F)
+      !*********************************************************************
+      ! Returns the value of the yield function evaluated at q, p , eta    *
+      !																	 *
+      !*********************************************************************
+      implicit none
+      real(kind = real_type), intent(in):: q, p, eta_y
+      real(kind = real_type), intent(out):: F
+
+      F=q+eta_y*p !sign is due to compression being negative in UMAT
+   end subroutine YieldFunction
 
 end module mod_yield_function
