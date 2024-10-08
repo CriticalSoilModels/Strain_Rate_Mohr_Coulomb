@@ -3,7 +3,7 @@ module mod_test_stress_invar_deriv_suite
     use kind_precision_module, only: dp, i32
     use mod_stress_invariants, only: calc_mean_stress, calc_q_invariant, calc_J2_invariant, &
                                      calc_inc_driver_J3_invariant, calc_theta_s
-    use mod_stress_invar_deriv, only: calc_dp_to_dSigma, calc_dq_to_dSigma, calc_dJ2_to_dSigma, calc_dJ3_to_dSigma, &
+    use mod_stress_invar_deriv, only: calc_mean_stress_to_dSigma, calc_dq_to_dSigma, calc_dJ2_to_dSigma, calc_dJ3_to_dSigma, &
                                       calc_inc_driver_dJ3_to_dSigma, calc_dtheta_to_dSigma, calc_dtheta_to_dSigma_2
     use mod_voigt_functions   , only: calc_dev_stess
     use mod_tensor_value_checker, only: check_tensor_values
@@ -22,7 +22,7 @@ contains
 
         ! Make the test suite using the subroutine defined below
         testsuite = [ &
-            new_unittest("dp/dSigma" , test_dp_to_dSigma),  &
+            new_unittest("dp/dSigma" , test_dMean_Stress_to_dSigma),  &
             new_unittest("dq/dSigma" , test_dq_to_dSigma),  &
             new_unittest("dJ2/dSigma", test_dJ2_to_dSigma), &
             new_unittest("dJ3/dSigma", test_dJ3_to_dSigma), &
@@ -31,29 +31,29 @@ contains
         
     end subroutine collect_stress_invar_deriv_suite
 
-    subroutine test_dp_to_dSigma(error)
+    subroutine test_dMean_Stress_to_dSigma(error)
         type(error_type), allocatable, intent(out) :: error
 
         ! Local variables
-        real(kind = dp) :: exp_dp_dSigma(6), dp_dSigma(6)
+        real(kind = dp) :: exp_dmean_dSigma(6), dmean_dSigma(6)
         real(kind = dp), parameter :: tol = 1e-9
         logical :: passed = .False.
         
         ! Calc the value using the function
-        dp_dSigma = calc_dp_to_dSigma()
+        dmean_dSigma = calc_mean_stress_to_dSigma()
         
         ! Calc the value using another method
-        exp_dp_dSigma(:) = 0.0
-        exp_dp_dSigma(1:3) = 1.0_dp / 3.0_dp
+        exp_dmean_dSigma(:) = 0.0
+        exp_dmean_dSigma(1:3) = 1.0_dp / 3.0_dp
         
         ! Check that all the values are the same within a tolerance
-        call check_tensor_values(dp_dSigma, exp_dp_dSigma, tol, passed)
+        call check_tensor_values(dmean_dSigma, exp_dmean_dSigma, tol, passed)
         
         ! Check that the check passed
         call check(error, passed, .True., more = "Indiv. dP/dSigma test")
         if(allocated(error)) return
         
-    end subroutine test_dp_to_dSigma
+    end subroutine test_dMean_Stress_to_dSigma
 
     subroutine test_dq_to_dSigma(error)
         type(error_type), allocatable, intent(out) ::  error
@@ -67,6 +67,7 @@ contains
         
         call random_number(stress)
         
+        stress = stress - [0.5, 0.0, 0.5, 0.0, 0.5, 0.0]
         mean_stress = calc_mean_stress(stress)
 
         dev_stress = calc_dev_stess(stress, mean_stress)

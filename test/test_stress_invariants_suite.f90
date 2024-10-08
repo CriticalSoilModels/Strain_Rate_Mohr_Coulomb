@@ -1,7 +1,7 @@
 module mod_test_stress_invariants_suite
    ! Local imports
    use kind_precision_module, only : dp, i32
-   use mod_SRMC_funcs       , only : Get_strain_invariants
+   use mod_strain_invariants, only : Get_strain_invariants
    use mod_stress_invariants, only : Get_invariants, calc_theta_s, calc_J2_invariant, &
                                      calc_inc_driver_J3_invariant, calc_mean_stress
    use stdlib_linalg        , only : det

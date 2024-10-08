@@ -8,17 +8,21 @@ module mod_stress_invar_deriv
 
 contains
 
-   pure function calc_dp_to_dSigma() result(dp_dSigma)
-      real(kind = real_type) :: dp_dSigma(6)
+   pure function calc_mean_stress_to_dSigma() result(dmean_dSigma)
+      real(kind = real_type) :: dmean_dSigma(6)
 
       ! Local variables
       integer :: i
 
+      ! Zero all the values
+      dmean_dSigma(:) = 0.0_real_type
+
+      ! Add the 1/3 to the first three elements
       do i = 1, 3
-         dp_dSigma(i) = 1.0_real_type / 3.0_real_type
+         dmean_dSigma(i) = 1.0_real_type / 3.0_real_type
       end do
 
-   end function calc_dp_to_dSigma
+   end function calc_mean_stress_to_dSigma
 
    pure function calc_dq_to_dSigma(dev, q) result(dq_dSigma)
       ! Calc dq/dSigma

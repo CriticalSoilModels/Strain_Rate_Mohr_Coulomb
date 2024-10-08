@@ -3,12 +3,12 @@
 module mod_plastic_potential
    use kind_precision_module , only: real_type => dp
    use mod_stress_invariants , only: Get_invariants
-   use mod_stress_invar_deriv, only: calc_dp_to_dSigma, calc_dq_to_dSigma
+   use mod_stress_invar_deriv, only: calc_mean_stress_to_dSigma, calc_dq_to_dSigma
    use mod_voigt_functions   , only: calc_dev_stess
    implicit none
 
 contains
-   pure subroutine Get_dP_to_dSigma(D, Sig, m_vec)
+   subroutine Get_dP_to_dSigma(D, Sig, m_vec)
       !************************************************************************
       ! Returns the derivative of the plastic potential function with respect *
       ! to the stress tensor													*
@@ -30,24 +30,19 @@ contains
       !Get dP/dp=-D and dF/dq=1
       !___________________________________________________________________________
       !1) Get dp/dSig=1/3 Imat
-      ! dpdsig=0.0d0
-      ! dpdsig(1)=1.0/3.0
-      ! dpdsig(2)=1.0/3.0
-      ! dpdsig(3)=1.0/3.0
-      
-      dpdsig = calc_dp_to_dSigma()
+      dpdsig=0.0d0
+            
+      dpdsig = calc_mean_stress_to_dSigma()
 
       !2) Get dq/dsig
-      ! dev=Sig
-      ! dev(1)=dev(1)-p
-      ! dev(2)=dev(2)-p
-      ! dev(3)=dev(3)-p
       dev = calc_dev_stess(Sig, p)
 
       dqdSig = calc_dq_to_dSigma(dev, q)
 
       !__________________________________________________________________
-      !Get m_vec=dP/dSig
+      !Get m_vec=dP/dSig]
+      ! Dilatancy is negative there
       m_vec=(-D*dpdsig)+dqdSig !m_vec=dP/dSig
+
    end subroutine Get_dP_to_dSigma
 end module mod_plastic_potential
