@@ -4,7 +4,7 @@ module mod_SRMC_funcs
    implicit none
 
 contains
-
+   ! Instead of this fucntion you can use matmul. It's a fortran intrinsic function for multiplying matrices of any size
    Subroutine MatVec(xMat,IM,Vec,N,VecR)
       !***********************************************************************
       !
@@ -36,6 +36,7 @@ contains
       Return
    End Subroutine MatVec
 
+   ! Instead of this function you should use dot_product. It's a fortran instrinsic
    Subroutine DotProduct_2(VecA, VecB,N, Dp)
       !***********************************************************************
       !
@@ -60,5 +61,6 @@ contains
       end do
 
    end subroutine DotProduct_2
+
 
 end module mod_SRMC_funcs
