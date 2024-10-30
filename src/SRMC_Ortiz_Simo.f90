@@ -183,7 +183,7 @@ contains
       ! Compute stress invariants
       call Get_invariants(Sigu, p, q, dummyVal)
 
-      do while (abs(F)>= FTOL .and. counter <= max_stress_iters)
+      do while (abs(F) > FTOL .and. counter <= max_stress_iters)
          !---------------------Begin Compute derivatives--------------------------!
          call Get_dF_to_dSigma(Mu, eta_yu, Sigu, n_vec) !n=dF/dSig
          call Get_dP_to_dSigma(Du, Sigu, m_vec) !m=dP/dSig
