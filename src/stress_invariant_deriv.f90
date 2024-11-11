@@ -166,7 +166,7 @@ contains
                                            TWO = 2.0_real_type
 
       ! Calc the term on the outside of the paranthesis
-      outside_term_1 = sqrt(THREE) / ( 2 * J2**(1.5) )
+      outside_term_1 = sqrt(THREE) / ( 2.0 * J2**(1.5) )
 
       outside_term_2 = 1/sqrt( 1 - (THREE * sqrt(THREE)/TWO * J3/J2**1.5)**2 )
 
