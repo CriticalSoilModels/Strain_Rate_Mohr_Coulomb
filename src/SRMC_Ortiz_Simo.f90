@@ -106,14 +106,13 @@ contains
       ! Apply strain rate updates
       I_f=I+dI
       call check4crossing(I,  I_f, dI, I_0, ApplyStrainRateUpdate)
-
       call Get_strain_invariants(EpsPu, epsv_p, epsq_p)
-
-      if (ApplyStrainRateUpdate) then !Update parameters
-         call Update_GK(G_0, nu, I_f, I_0, k_G, k_K, G, K)
-         call Get_Dp(h, D_min, I_f, I_0, epsq_p, k_D, ApplyStrainRateUpdate, Du)
-         eta_yu = Mu-du*(1.0 * No)
-      endif
+      call Update_GK(G_0, nu, I_f, I_0, k_G, k_K, G, K)
+      call Get_Dp(h, D_min, I_f, I_0, epsq_p, k_D, ApplyStrainRateUpdate, Du) ! Need this for the strain rate but also to actually calculate Du
+      eta_yu = Mu-du*(1.0 * No)
+      
+      ! if (ApplyStrainRateUpdate) then !Update parameters
+      ! endif
 
       ! Turn off strain rate affects
       ApplyStrainRateUpdate = .false.
@@ -183,7 +182,7 @@ contains
       ! Compute stress invariants
       call Get_invariants(Sigu, p, q, dummyVal)
 
-      do while (abs(F) > FTOL .and. counter <= max_stress_iters)
+      do while (abs(F) >= FTOL .and. counter <= max_stress_iters)
          !---------------------Begin Compute derivatives--------------------------!
          call Get_dF_to_dSigma(Mu, eta_yu, Sigu, n_vec) !n=dF/dSig
          call Get_dP_to_dSigma(Du, Sigu, m_vec) !m=dP/dSig
@@ -225,21 +224,13 @@ contains
          EpsPu = EpsPu + dEpsPu
 
          ! Calc strain invariants
-         call Get_strain_invariants(EpsPu, epsv_p, epsq_p)
+         ! call Get_strain_invariants(EpsPu, epsv_p, epsq_p)
 
-         ! Calc a = dD/dEpsP
-         call Get_dD_to_dEpsP(D_min, h, I_0, k_D, epsq_p, epsv_p, &
-            dEpsPu, I, ApplyStrainRateUpdate, a) !a=dD/dEpsP
+         ! ! Calc a = dD/dEpsP
+         ! call Get_dD_to_dEpsP(D_min, h, I_0, k_D, epsq_p, epsv_p, &
+         !    dEpsPu, I, ApplyStrainRateUpdate, a) !a=dD/dEpsP
 
-         ! Update dilatancy
-         dD = 0.0
-         ! This line gives difficulties sometimes
-         call DotProduct_2(a, dEpsPu, 6, dD) !plastic hard/softening
-
-         ! Calc the new dilatancy
-         call Get_Dp(h, D_min, I_f, I_0, epsq_p, k_D, ApplyStrainRateUpdate, Du)
-
-         !  Du = Du + dD
+         ! Don't need to update the diltancy. It's a function of the total deviatoric strain. Not the plastic part 
 
          ! Update eta_y
          eta_yu = Mu - Du * (1.0 -No)
