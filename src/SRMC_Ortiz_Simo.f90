@@ -110,9 +110,6 @@ contains
       call Update_GK(G_0, nu, I_f, I_0, k_G, k_K, G, K)
       call Get_Dp(h, D_min, I_f, I_0, epsq_p, k_D, ApplyStrainRateUpdate, Du) ! Need this for the strain rate but also to actually calculate Du
       eta_yu = Mu-du*(1.0 * No)
-      
-      ! if (ApplyStrainRateUpdate) then !Update parameters
-      ! endif
 
       ! Turn off strain rate affects
       ApplyStrainRateUpdate = .false.
